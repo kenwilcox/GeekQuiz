@@ -177,6 +177,11 @@
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\TriviaAnswer.cs" />
+    <Compile Include="Models\TriviaContext.cs" />
+    <Compile Include="Models\TriviaDatabaseInitializer.cs" />
+    <Compile Include="Models\TriviaOption.cs" />
+    <Compile Include="Models\TriviaQuestion.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
