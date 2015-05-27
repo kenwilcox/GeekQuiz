@@ -22,7 +22,7 @@ namespace GeekQuiz.Controllers
         public async Task<IHttpActionResult> Get()
         {
             var userId = User.Identity.Name;
-            var nextQuestion = await this.NextQuestion(userId);
+            var nextQuestion = await this.NextQuestionAsync(userId);
 
             if (nextQuestion == null)
             {
@@ -33,7 +33,7 @@ namespace GeekQuiz.Controllers
         }
 
         // POST api/Trivia
-        [ResponseType(typeof (TriviaAnswer))]
+        [ResponseType(typeof(TriviaAnswer))]
         public async Task<IHttpActionResult> Post(TriviaAnswer answer)
         {
             if (!ModelState.IsValid)
@@ -57,13 +57,13 @@ namespace GeekQuiz.Controllers
             base.Dispose(disposing);
         }
 
-        private async Task<TriviaQuestion> NextQuestion(string userId)
+        private async Task<TriviaQuestion> NextQuestionAsync(string userId)
         {
             var lastQuestionId = await this.db.TriviaAnswers
                 .Where(a => a.UserId == userId)
                 .GroupBy(a => a.QuestionId)
-                .Select(g => new {QuestionId = g.Key, Count = g.Count()})
-                .OrderByDescending(q => new {q.Count, QuestionId = q.QuestionId})
+                .Select(g => new { QuestionId = g.Key, Count = g.Count() })
+                .OrderByDescending(q => new { q.Count, QuestionId = q.QuestionId })
                 .Select(q => q.QuestionId)
                 .FirstOrDefaultAsync();
 
@@ -78,7 +78,7 @@ namespace GeekQuiz.Controllers
             this.db.TriviaAnswers.Add(answer);
 
             await this.db.SaveChangesAsync();
-            var selectedOption = await this.db.TriviaOptions.FirstOrDefaultAsync(o => o.Id == answer.OptionId 
+            var selectedOption = await this.db.TriviaOptions.FirstOrDefaultAsync(o => o.Id == answer.OptionId
                 && o.QuestionId == answer.QuestionId);
             return selectedOption.IsCorrect;
         }

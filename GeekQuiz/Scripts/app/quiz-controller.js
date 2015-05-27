@@ -1,4 +1,4 @@
-﻿angular.module("QuizAp", [])
+﻿angular.module("QuizApp", [])
     .controller("QuizCtrl", function($scope, $http) {
         $scope.answered = false;
         $scope.title = "loading question...";
@@ -6,7 +6,8 @@
         $scope.correctAnswer = false;
         $scope.working = false;
 
-        $scope.answered = function() {
+        $scope.answer = function () {
+            debugger;
             return $scope.correctAnswer ? "correct" : "incorrect";
         };
 
@@ -16,7 +17,8 @@
             $scope.title = "loading question...";
             $scope.options = [];
 
-            $http.get("/api/trivia").success(function(data, status, headers, config) {
+            $http.get("/api/trivia").success(function (data, status, headers, config) {
+                debugger;
                 $scope.options = data.options;
                 $scope.title = data.title;
                 $scope.answered = false;
@@ -27,14 +29,15 @@
             });
         };
 
-        $scope.sendAnswer = function(option) {
+        $scope.sendAnswer = function (option) {
             $scope.working = true;
             $scope.answered = true;
-
-            $http.post("/api/trivia", { 'questionId': Option.questionId, 'optionId': option.id }).success(function(data, status, headers, config) {
+            debugger;
+            $http.post("/api/trivia", { 'questionId': option.questionId, 'optionId': option.id }).success(function (data, status, headers, config) {
+                debugger;
                 $scope.correctAnswer = (data === true);
                 $scope.working = false;
-            }).error(function(data, status, headers, config) {
+            }).error(function (data, status, headers, config) {
                 $scope.title = "Oops... something went wrong";
                 $scope.working = false;
             });
