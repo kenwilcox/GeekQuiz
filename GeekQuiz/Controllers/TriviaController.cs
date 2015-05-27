@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
+﻿using System.Linq;
 using System.Web.Http;
 using System.Data.Entity;
 using System.Threading;
@@ -22,14 +18,14 @@ namespace GeekQuiz.Controllers
         public async Task<IHttpActionResult> Get()
         {
             var userId = User.Identity.Name;
-            var nextQuestion = await this.NextQuestionAsync(userId);
+            var nextQuestion = await NextQuestionAsync(userId);
 
             if (nextQuestion == null)
             {
-                return this.NotFound();
+                return NotFound();
             }
 
-            return this.Ok(nextQuestion);
+            return Ok(nextQuestion);
         }
 
         // POST api/Trivia
@@ -38,20 +34,20 @@ namespace GeekQuiz.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return this.BadRequest(this.ModelState);
+                return BadRequest(ModelState);
             }
 
             answer.UserId = User.Identity.Name;
 
-            var isCorrect = await this.StoreAsync(answer);
-            return this.Ok<bool>(isCorrect);
+            var isCorrect = await StoreAsync(answer);
+            return Ok(isCorrect);
         }
 
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                this.db.Dispose();
+                db.Dispose();
             }
 
             base.Dispose(disposing);
@@ -59,26 +55,26 @@ namespace GeekQuiz.Controllers
 
         private async Task<TriviaQuestion> NextQuestionAsync(string userId)
         {
-            var lastQuestionId = await this.db.TriviaAnswers
+            var lastQuestionId = await db.TriviaAnswers
                 .Where(a => a.UserId == userId)
                 .GroupBy(a => a.QuestionId)
                 .Select(g => new { QuestionId = g.Key, Count = g.Count() })
-                .OrderByDescending(q => new { q.Count, QuestionId = q.QuestionId })
+                .OrderByDescending(q => new { q.Count, q.QuestionId })
                 .Select(q => q.QuestionId)
                 .FirstOrDefaultAsync();
 
-            var questionsCount = await this.db.TriviaQuestions.CountAsync();
+            var questionsCount = await db.TriviaQuestions.CountAsync();
 
             var nextQuestionId = (lastQuestionId % questionsCount) + 1;
-            return await this.db.TriviaQuestions.FindAsync(CancellationToken.None, nextQuestionId);
+            return await db.TriviaQuestions.FindAsync(CancellationToken.None, nextQuestionId);
         }
 
         private async Task<bool> StoreAsync(TriviaAnswer answer)
         {
-            this.db.TriviaAnswers.Add(answer);
+            db.TriviaAnswers.Add(answer);
 
-            await this.db.SaveChangesAsync();
-            var selectedOption = await this.db.TriviaOptions.FirstOrDefaultAsync(o => o.Id == answer.OptionId
+            await db.SaveChangesAsync();
+            var selectedOption = await db.TriviaOptions.FirstOrDefaultAsync(o => o.Id == answer.OptionId
                 && o.QuestionId == answer.QuestionId);
             return selectedOption.IsCorrect;
         }
